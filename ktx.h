@@ -36,31 +36,39 @@ struct ktx_internal_testcase
 {
 	const char *name;
 	unsigned long test_cnt;
+	unsigned long eval_cnt;
 	unsigned long fail_cnt;
+	int skip_next;
 };
 typedef struct ktx_internal_testcase ktx_tc_t;
 
 static inline int ktx_internal_assert(ktx_tc_t *tc, int eval, const char *expr, unsigned long value1, unsigned long value2)
 {
-	KTX_LOGGER("%s: %s\n", tc->name, !!(eval) ? "PASS" : "FAILED");
-	KTX_LOGGER("\tEvaluation: %lu == %lu\n", value1, value2);
-	KTX_LOGGER("\tExpression: %s\n", expr);
-	if (!(expr))
-	{
-		tc->fail_cnt++;
-		return KTX_NOTEQ;
-	}
+	int ret = KTX_EQUAL;
 	tc->test_cnt++;
-	return KTX_EQUAL;
+	if (!(tc->skip_next))
+	{
+		KTX_LOGGER("%s: %s\n", tc->name, !!(eval) ? "PASS" : "FAILED");
+		KTX_LOGGER("\tEvaluation: %lu == %lu\n", value1, value2);
+		KTX_LOGGER("\tExpression: %s\n", expr);
+		if (!(eval))
+		{
+			tc->fail_cnt++;
+			ret = KTX_NOTEQ;
+		}
+		tc->eval_cnt++;
+	}
+	return ret;
 }
 
 static inline void ktx_internal_report(ktx_tc_t *tc)
 {
 	KTX_LOGGER("[*] TESTCASE Report\n");
 	KTX_LOGGER(" | TC Name   : %s\n", tc->name);
+	KTX_LOGGER(" | Testnum   : %lu\n", tc->test_cnt);
 	KTX_LOGGER(" | Result    : %s\n", !!(tc->fail_cnt) ? "FAILED" : "PASS");
-	KTX_LOGGER(" | Tested    : %lu\n", tc->test_cnt);
-	KTX_LOGGER(" | Passed    : %lu\n", tc->test_cnt - tc->fail_cnt);
+	KTX_LOGGER(" | Tested    : %lu\n", tc->eval_cnt);
+	KTX_LOGGER(" | Passed    : %lu\n", tc->eval_cnt - tc->fail_cnt);
 	KTX_LOGGER(" | Failed    : %lu\n", tc->fail_cnt);
 	KTX_LOGGER("[*]\n");
 }
@@ -73,14 +81,17 @@ static inline void ktx_internal_report(ktx_tc_t *tc)
 	KTX_INTERNAL_STRC(tc) = { \
 		.name = KTX_INTERNAL_STRINGIFY(tc), \
 		.test_cnt = 0, \
-		.fail_cnt = 0 \
+		.eval_cnt = 0, \
+		.fail_cnt = 0, \
+		.skip_next = 0 \
 	}
 #define KTX_INTERNAL_ACCESS(tc) \
 	(&( ktx_strc_ ## tc ))
 #define KTX_INTERNAL_FUNC(tc) \
 	void ktx_func_ ## tc (void)
 #define KTX_INTERNAL_ASSERT(tc, expr, value1, value2) \
-	ktx_internal_assert((tc), (expr), KTX_INTERNAL_STRINGIFY(expr), (value1), (value2))
+	ktx_internal_assert((tc), KTX_INTERNAL_TESTEQ_EXPR(value1, value2), \
+		KTX_INTERNAL_STRINGIFY(expr), (value1), (value2))
 
 /**
  * @def KTX_DECLARE(tc)
@@ -106,16 +117,20 @@ static inline void ktx_internal_report(ktx_tc_t *tc)
  */
 #define KTX_CHECK(tc, expr1, expr2) \
 	KTX_INTERNAL_ASSERT(KTX_INTERNAL_ACCESS(tc), \
-		KTX_INTERNAL_TESTEQ_EXPR(expr1, expr2), expr1, expr2)
+		KTX_INTERNAL_TESTEQ_EXPR(expr1, expr2), \
+		(unsigned long)(expr1), (unsigned long)(expr2))
 
 /**
  * @def KTX_REQUIRE(tc)
  * 	Macro function to write check-expressions.
  * 	If two expressions are not the same, the test-case will return immediately.
  */
+
 #define KTX_REQUIRE(tc, expr1, expr2) \
 	if (KTX_CHECK(tc, expr1, expr2) == KTX_NOTEQ) \
-		return;
+	{ \
+		KTX_INTERNAL_ACCESS(tc)->skip_next = 1; \
+	}
 /**
  * @def KTX_RUN(tc)
  * 	Macro function to run test-cases.
