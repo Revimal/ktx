@@ -2,7 +2,7 @@
  * @file ktx.h
  * @brief Kernel Test eXpressions
  *
- * A simple, header-only, test framework for kernel projects.
+ * A simple, header-only, testing framework for kernel projects.
  * Inspired by 'Catch2'.
  *
  * @author Hyeonho Seo (Revimal)
@@ -13,6 +13,12 @@
 #define _KTX_H
 
 #include <linux/printk.h>
+
+/**
+ * @def KTX_VERSION
+ * 	KTX's version string
+ */
+#define KTX_VERSION "1.0.0"
 
 /**
  * @def KTX_EQUAL
