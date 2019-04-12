@@ -48,16 +48,17 @@ struct ktx_internal_testcase
 };
 typedef struct ktx_internal_testcase ktx_tc_t;
 
-static inline int ktx_internal_assert(ktx_tc_t *tc, int eval, const char *expr, unsigned long value1, unsigned long value2)
+static inline int ktx_internal_assert(ktx_tc_t *tc, const char *expr, unsigned long value1, unsigned long value2)
 {
+	const int eval = !!(value1 == value2);
 	int ret = KTX_EQUAL;
 	tc->test_cnt++;
 	if (!(tc->skip_next))
 	{
-		KTX_LOGGER("%s: %s\n", tc->name, !!(eval) ? "PASS" : "FAILED");
+		KTX_LOGGER("%s: %s\n", tc->name, !!eval ? "PASS" : "FAILED");
 		KTX_LOGGER("\tEvaluation: %lu == %lu\n", value1, value2);
 		KTX_LOGGER("\tExpression: %s\n", expr);
-		if (!(eval))
+		if (!eval)
 		{
 			tc->fail_cnt++;
 			ret = KTX_NOTEQ;
@@ -96,8 +97,7 @@ static inline void ktx_internal_report(ktx_tc_t *tc)
 #define KTX_INTERNAL_FUNC(tc) \
 	void ktx_func_ ## tc (void)
 #define KTX_INTERNAL_ASSERT(tc, expr, value1, value2) \
-	ktx_internal_assert((tc), KTX_INTERNAL_TESTEQ_EXPR(value1, value2), \
-		KTX_INTERNAL_STRINGIFY(expr), (value1), (value2))
+	ktx_internal_assert((tc), KTX_INTERNAL_STRINGIFY(expr), (value1), (value2))
 
 /**
  * @def KTX_DECLARE(tc)
