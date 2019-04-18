@@ -1,7 +1,7 @@
 ![ktx logo](logo.png)
 
 [![Beerware License](https://img.shields.io/badge/license-Beerware-green.svg)](https://wikipedia.org/wiki/Beerware)
-[![Release: 1.0.0](https://img.shields.io/badge/release-v1.0.0-blue.svg)](https://github.com/revimal/ktx/releases/tag/v1.0.0)
+[![Release: 1.0.1](https://img.shields.io/badge/release-v1.0.1-blue.svg)](https://github.com/revimal/ktx/releases/tag/v1.0.1)
 
 ## What is the Kernel Test eXpressions?
 Kernel Test eXpressions(KTX) is the most simple testing framework for kernel projects.

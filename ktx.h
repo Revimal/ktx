@@ -18,7 +18,7 @@
  * @def KTX_VERSION
  * 	KTX's version string
  */
-#define KTX_VERSION "1.0.0"
+#define KTX_VERSION "1.0.1"
 
 /**
  * @def KTX_EQUAL
