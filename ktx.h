@@ -25,6 +25,7 @@
  * 	Same as 0
  */
 #define KTX_EQUAL 0
+
 /**
  * @def KTX_EQUAL
  * 	Same as 1
@@ -107,6 +108,7 @@ static inline void ktx_internal_report(ktx_tc_t *tc)
 #define KTX_DECLARE(tc) \
 	extern KTX_INTERNAL_STRC(tc); \
 	extern KTX_INTERNAL_FUNC(tc)
+
 /**
  * @def KTX_DEFINE(tc)
  * 	Macro function to define test-cases.
@@ -115,6 +117,7 @@ static inline void ktx_internal_report(ktx_tc_t *tc)
 #define KTX_DEFINE(tc) \
 	KTX_INTERNAL_INIT(tc); \
 	KTX_INTERNAL_FUNC(tc)
+
 /**
  * @def KTX_CHECK(tc)
  * 	Macro function to write check-expressions.
@@ -131,12 +134,12 @@ static inline void ktx_internal_report(ktx_tc_t *tc)
  * 	Macro function to write check-expressions.
  * 	If two expressions are not the same, the test-case will return immediately.
  */
-
 #define KTX_REQUIRE(tc, expr1, expr2) \
 	if (KTX_CHECK(tc, expr1, expr2) == KTX_NOTEQ) \
 	{ \
 		KTX_INTERNAL_ACCESS(tc)->skip_next = 1; \
 	}
+
 /**
  * @def KTX_RUN(tc)
  * 	Macro function to run test-cases.
